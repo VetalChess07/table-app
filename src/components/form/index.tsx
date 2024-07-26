@@ -8,6 +8,7 @@ import ErrorsMessage from "../../UI/errors";
 import { UserI } from "../../types/UserType";
 import { validateMinLenStr } from "../../utils/validateMinLenStr";
 import { validatePhone } from "../../utils/validatePhone";
+import { addSubordinate } from "../../utils/addSubordinate";
 
 import type { FormType } from "./type";
 
@@ -33,11 +34,7 @@ const Form: FC<FormType> = memo(
 
     const handleAddUser = (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-
-      // Reset errors
       setErrors({});
-
-      // Validate inputs
       const newErrors: { name?: string; phone?: string } = {};
 
       if (!validateMinLenStr(name, 2)) {
@@ -48,14 +45,11 @@ const Form: FC<FormType> = memo(
         newErrors.phone = "Введите корректный номер телефона.";
       }
 
-      console.log(newErrors);
-      // If there are errors, update state and prevent form submission
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
         return;
       }
 
-      // Create new user
       const newUser = {
         id: Date.now(),
         name,
@@ -64,9 +58,8 @@ const Form: FC<FormType> = memo(
         subordinates: [],
       };
 
-      // Add new user to the list
       const updatedUsers = parentId
-        ? addSubordinate(users, parseInt(parentId, 10), newUser)
+        ? addSubordinate({ users, parentId: parseInt(parentId, 10), newUser })
         : [...users, newUser];
 
       setUsers(updatedUsers);
@@ -74,25 +67,6 @@ const Form: FC<FormType> = memo(
       setPhone("");
       setParentId("");
       setModalIsOpen(false);
-    };
-
-    const addSubordinate = (
-      users: UserI[],
-      parentId: number,
-      newUser: UserI
-    ): UserI[] => {
-      return users.map((user: UserI) => {
-        if (user.id === parentId) {
-          return { ...user, subordinates: [...user.subordinates, newUser] };
-        } else if (user.subordinates.length > 0) {
-          return {
-            ...user,
-            subordinates: addSubordinate(user.subordinates, parentId, newUser),
-          };
-        } else {
-          return user;
-        }
-      });
     };
 
     return (
