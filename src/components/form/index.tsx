@@ -116,7 +116,7 @@ const Form: FC<FormType> = memo(
             type="text"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="Введите телефон"
+            placeholder="Формат: +7,7,8 без пробелов и других символов"
             style={errors.phone ? styleError : undefined}
           />
           {errors.phone && <ErrorsMessage>{errors.phone}</ErrorsMessage>}
